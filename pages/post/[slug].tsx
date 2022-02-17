@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../../components/Header';
 import { sanityClient, urlFor } from '../../sanity'
 import PortableText from 'react-portable-text'
@@ -7,7 +7,11 @@ function SlugPost({ post }) {
   
   const { register, handleSubmit, formState: { errors }, } = useForm();
   
+  const [submitChecker, setSubmitChecker] = useState(0);
+
+
   const onSubmit = async (data) => {
+    setSubmitChecker(1);
     await fetch("/api/createComment", {
       method: 'POST',
       body: JSON.stringify(data),
@@ -63,7 +67,7 @@ function SlugPost({ post }) {
 
       <label className="block mb-5">
         <span className="text-gray-700">Name</span>
-        <input {...register("name",{required:true})} type="text" placeholder="Mike Coxlong" className="inp"/>
+        <input {...register("name",{required:true})} type="text" placeholder="Mike" className="inp"/>
       </label>
       <label className="block mb-5">
         <span className="text-gray-700">Email</span>
@@ -87,12 +91,14 @@ function SlugPost({ post }) {
       </div>
       
       <button type="submit" className="bg-yellow-500 shadow hover:bg-yellow-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded cursor-pointer">Submit</button>
-
+      
+      
+      
 
 
 
     </form>
-
+{submitChecker?(<p  className="text-center p-3 text-xl text-red-500">Comment Submitted,refresh the page to see updated comments</p>) :(<p></p>)}
     {/* Comments */}
 
     <div className="flex flex-col p-10 my-10 max-w-2xl mx-auto shadow-yellow-500 shadow space-y-2">
@@ -142,7 +148,7 @@ export async function getStaticProps({ params }) {
     image
   },
   description,mainImage,slug,body,
-  'comments': *[ _type == "comment" && post._ref==^._id && approved==true],
+  'comments': *[ _type == "comment" && post._ref==^._id],
   
 }`
 
@@ -161,7 +167,7 @@ export async function getStaticProps({ params }) {
     props: {
       post,
     },
-    revalidate:60,
+    revalidate:5,
   }
   
 }
